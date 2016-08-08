@@ -1,0 +1,23 @@
+FROM ubuntu:trusty
+MAINTAINER Chris Kleeschulte <chrisk@bitpay.com>
+RUN useradd -d /home/ubuntu -m -s /bin/bash ubuntu
+RUN mkdir -p -m0755 /var/run/sshd
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+apt-get --no-install-recommends -yq install \
+build-essential \
+curl \
+g++-multilib \
+git-core \
+pkg-config \
+autoconf \
+libtool \
+automake \
+faketime \
+bsdmainutils \
+binutils-gold \
+ca-certificates \
+python \
+openssh-server \
+rsync
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

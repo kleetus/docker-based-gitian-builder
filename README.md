@@ -12,3 +12,9 @@ We shall:
 2. The first one is the builder, contains the bitcoin and gitian-builder directories
 3. The second one is the container that does the builds, producing the artifacts
 4. The reason for using 2 docker images/containers is that Docker is cross-platform, therefore we don't know if w e have all of the required dependencies for gitian-builder. We could put gitian-builder directly on the second container, but we don't want to pollute that file system with unnecessary items. Plus, we might be able to use the first container to spawn/drive many build containers at once.
+
+
+Design Considerations:
+
+1. All work is done in LXC's, so that THE ONLY dependency on the HOST system (Docker Hypervisor) is Docker itself. Therefore, anywhere Docker runs, this gitian build should run.
+2. There will be one shared volume, possibly a data volume container that will hold ssh keys and the output
