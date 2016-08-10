@@ -11,10 +11,12 @@ openssh-client \
 rsync \
 sudo
 RUN bash -c "echo '#!/bin/bash' > /home/debian/copy_keys"
-RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa* /shared/' >> /home/debian/copy_keys"
-RUN bash -c "echo 'chown debian.debian /shared/id_rsa*' >> /home/debian/copy_keys"
+RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa.pub /shared/' >> /home/debian/copy_keys"
+RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa.pub /shared/root_id_rsa.pub' >> /home/debian/copy_keys"
+RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa* /home/debian/gitian-builder/var/' >> /home/debian/copy_keys"
+RUN bash -c "echo 'chown debian.debian /shared/id_rsa* /home/debian/gitian-builder/var/id_rsa*' >> /home/debian/copy_keys"
 RUN bash -c "chmod +x /home/debian/copy_keys"
 RUN bash -c "echo '%debian ALL=NOPASSWD: /home/debian/copy_keys' > /etc/sudoers.d/copy_keys"
 USER debian
 RUN ssh-keygen -t rsa -N '' -f /home/debian/.ssh/id_rsa
-
+RUN bash -c "echo \"alias ssh='ssh -oStrictHostKeyChecking=no'\" >> /home/debian/.bashrc" 
