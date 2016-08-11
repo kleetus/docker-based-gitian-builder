@@ -1,9 +1,10 @@
 FROM debian:stable
 MAINTAINER Chris Kleeschulte <chrisk@bitpay.com>
-RUN useradd -d /home/debian -m -s /bin/bash debian 
+RUN useradd -d /home/debian -m -s /bin/bash debian
 WORKDIR /home/debian
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-apt-get --no-install-recommends -yq install \
+RUN apt-get update && \
+DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -yq install \
+apt-cacher-ng \
 git-core \
 ca-certificates \
 ruby \
@@ -19,14 +20,18 @@ RUN bash -c "chmod +x /home/debian/copy_keys"
 RUN bash -c "echo '%debian ALL=NOPASSWD: /home/debian/copy_keys' > /etc/sudoers.d/copy_keys"
 USER debian
 RUN ssh-keygen -t rsa -N '' -f /home/debian/.ssh/id_rsa
-RUN bash -c "echo \"alias ssh='ssh -oStrictHostKeyChecking=no'\" >> /home/debian/.bashrc" 
-RUN bash -c "cd /home/debian"
-RUN bash -c "git clone --depth 1 https://github.com/devrandom/gitian-builder" 
-RUN bash -c "git clone --depth 1 https://github.com/bitpay/bitcoin" 
-RUN bash -c "mkdir -p /home/debian/gitian-builder/var"
+RUN git clone --depth 1 https://github.com/devrandom/gitian-builder
+RUN git clone --depth 1 https://github.com/bitpay/bitcoin
+RUN bash -c "echo \"alias ssh='ssh -oStrictHostKeyChecking=no'\" >> /home/debian/.bashrc"
 RUN bash -c "echo '#!/bin/bash' > /home/debian/runit.sh"
-RUN bash -c "echo 'sudo /home/debian/copy_keys && \
-ssh -fN -oExitOnForwardFailure=yes -oStrictHostKeyChecking=no ubuntu@builder -L 2223:localhost:22 && \
-pushd /home/debian/gitian-builder; \
-./bin/gbuild --skip-image --allow-sudo --commit bitcoin=$1 --url bitcoin=$2 ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml' >> /home/debian/runit.sh" 
+RUN bash -c "echo 'set -e' >> /home/debian/runit.sh"
+RUN bash -c "echo 'mkdir -p /home/debian/gitian-builder/var' >> /home/debian/runit.sh"
+RUN bash -c "echo 'sudo /home/debian/copy_keys' >> /home/debian/runit.sh"
+RUN bash -c "echo 'ssh -fN -oExitOnForwardFailure=yes -oStrictHostKeyChecking=no ubuntu@builder -L 2223:localhost:22' >> /home/debian/runit.sh"
+RUN bash -c "echo 'cd /home/debian/gitian-builder; cmd=\"./bin/gbuild --skip-image --allow-sudo --commit bitcoin=\$1 --url bitcoin=\$2 ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml\"; echo \$cmd; \${cmd}&' >> /home/debian/runit.sh"
+RUN bash -c "echo 'while [ ! -e \"var/build.log\" ];' >> /home/debian/runit.sh"
+RUN bash -c "echo 'do' >> /home/debian/runit.sh"
+RUN bash -c "echo 'sleep 1' >> /home/debian/runit.sh"
+RUN bash -c "echo 'done' >> /home/debian/runit.sh"
+RUN bash -c "echo 'tail -f var/build.log' >> /home/debian/runit.sh"
 RUN bash -c "chmod +x /home/debian/runit.sh"
