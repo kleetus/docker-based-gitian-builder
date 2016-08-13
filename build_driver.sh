@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t driver --force-rm=true -f ./Dockerfile_driver .
+docker build -t driver --force-rm=true -f ./Dockerfile.driver .

@@ -4,4 +4,22 @@ e57e45c1c16f0b8d69eaab8e4abc1b641f435bb453377a0ac5f85cf1f34bf94b  bitcoin-0.12.1
 f570bdbe42698bf770ffbf0540a41321b9d02c46e3f5c96650c14e126eafdbb3  bitcoin-linux-0.12-res.yml
 
 
+1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
+e57e45c1c16f0b8d69eaab8e4abc1b641f435bb453377a0ac5f85cf1f34bf94b  bitcoin-0.12.1-linux64.tar.gz
+58410f1ad8237dfb554e01f304e185c2b2604016f9c406e323f5a4db167ca758  src/bitcoin-0.12.1.tar.gz
+f570bdbe42698bf770ffbf0540a41321b9d02c46e3f5c96650c14e126eafdbb3  bitcoin-linux-0.12-res.yml
+
+
+1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
+e57e45c1c16f0b8d69eaab8e4abc1b641f435bb453377a0ac5f85cf1f34bf94b  bitcoin-0.12.1-linux64.tar.gz
+58410f1ad8237dfb554e01f304e185c2b2604016f9c406e323f5a4db167ca758  src/bitcoin-0.12.1.tar.gz
+f570bdbe42698bf770ffbf0540a41321b9d02c46e3f5c96650c14e126eafdbb3  bitcoin-linux-0.12-res.yml
+
+driver     | 1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
+driver     | e57e45c1c16f0b8d69eaab8e4abc1b641f435bb453377a0ac5f85cf1f34bf94b  bitcoin-0.12.1-linux64.tar.gz
+driver     | 58410f1ad8237dfb554e01f304e185c2b2604016f9c406e323f5a4db167ca758  src/bitcoin-0.12.1.tar.gz
+driver     | f570bdbe42698bf770ffbf0540a41321b9d02c46e3f5c96650c14e126eafdbb3  bitcoin-linux-0.12-res.yml
+
+
+
 

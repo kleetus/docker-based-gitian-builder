@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t builder -f ./Dockerfile_builder . 
+docker build -t builder -f ./Dockerfile.builder . 

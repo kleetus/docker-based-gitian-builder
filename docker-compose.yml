@@ -1,0 +1,31 @@
+---
+version: '2'
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    image: builder
+    container_name: builder
+    expose:
+      - 22 
+    hostname: builder
+    command: ["/usr/sbin/sshd", "-D"] 
+    volumes:
+      - ./shared:/shared
+  driver:
+    build:
+      context: .
+      dockerfile: Dockerfile.driver
+    working_dir: '/home/debian/gitian-builder'
+    command: ["/home/debian/runit.sh", "v0.12.1-bitcore-2", "https://github.com/bitpay/bitcoin.git"]
+    image: driver
+    container_name: driver 
+    depends_on:
+      - builder
+    links:
+      - builder
+    volumes:
+      - ./shared:/shared
+    hostname: driver
+    user: debian
