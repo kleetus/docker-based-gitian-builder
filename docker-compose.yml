@@ -12,12 +12,13 @@ services:
     hostname: builder
     command: ["/usr/sbin/sshd", "-D"] 
     volumes:
-      - ./shared:/shared
+      - ./shared/root_pubkey:/root/.ssh
+      - ./shared/ubuntu_pubkey:/ubuntu/.ssh
   driver:
     build:
       context: .
       dockerfile: Dockerfile.driver
-    working_dir: '/home/debian/gitian-builder'
+    working_dir: '/home/debian'
     command: ["/home/debian/runit.sh", "v0.12.1-bitcore-2", "https://github.com/bitpay/bitcoin.git"]
     image: driver
     container_name: driver 
@@ -26,6 +27,6 @@ services:
     links:
       - builder
     volumes:
-      - ./shared:/shared
+      - ./shared:/home/debian/shared
     hostname: driver
     user: debian

@@ -11,27 +11,29 @@ ruby \
 openssh-client \
 rsync \
 sudo
-RUN bash -c "echo '#!/bin/bash' > /home/debian/copy_keys"
-RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa.pub /shared/' >> /home/debian/copy_keys"
-RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa.pub /shared/root_id_rsa.pub' >> /home/debian/copy_keys"
-RUN bash -c "echo 'cp -r /home/debian/.ssh/id_rsa* /home/debian/gitian-builder/var/' >> /home/debian/copy_keys"
-RUN bash -c "echo 'chown debian.debian /shared/id_rsa* /home/debian/gitian-builder/var/id_rsa*' >> /home/debian/copy_keys"
-RUN bash -c "chmod +x /home/debian/copy_keys"
-RUN bash -c "echo '%debian ALL=NOPASSWD: /home/debian/copy_keys' > /etc/sudoers.d/copy_keys"
+RUN echo '#!/bin/bash' > /home/debian/copy_keys && \
+echo 'mkdir -p /home/debian/shared/root_pubkey' >> /home/debian/copy_keys && \
+echo 'mkdir -p /home/debian/shared/ubuntu_pubkey' >> /home/debian/copy_keys && \
+echo 'cp -r /home/debian/.ssh/id_rsa.pub /home/debian/shared/ubuntu_pubkey/authorized_keys' >> /home/debian/copy_keys && \
+echo 'cp -r /home/debian/.ssh/id_rsa.pub /home/debian/shared/root_pubkey/authorized_keys' >> /home/debian/copy_keys && \
+echo 'cp -r /home/debian/.ssh/id_rsa* /home/debian/shared/gitian-builder/var/' >> /home/debian/copy_keys && \
+echo 'chown debian.debian /home/debian/shared/gitian-builder/var/id_rsa*' >> /home/debian/copy_keys && \
+chmod +x /home/debian/copy_keys && \
+echo '%debian ALL=NOPASSWD: /home/debian/copy_keys' > /etc/sudoers.d/copy_keys
 USER debian
-RUN ssh-keygen -t rsa -N '' -f /home/debian/.ssh/id_rsa
-RUN git clone --depth 1 https://github.com/devrandom/gitian-builder
-RUN git clone --depth 1 https://github.com/bitpay/bitcoin
-RUN bash -c "echo \"alias ssh='ssh -oStrictHostKeyChecking=no'\" >> /home/debian/.bashrc"
-RUN bash -c "echo '#!/bin/bash' > /home/debian/runit.sh"
-RUN bash -c "echo 'set -e' >> /home/debian/runit.sh"
-RUN bash -c "echo 'mkdir -p /home/debian/gitian-builder/var' >> /home/debian/runit.sh"
-RUN bash -c "echo 'sudo /home/debian/copy_keys' >> /home/debian/runit.sh"
-RUN bash -c "echo 'ssh -fN -oExitOnForwardFailure=yes -oStrictHostKeyChecking=no ubuntu@builder -L 2223:localhost:22' >> /home/debian/runit.sh"
-RUN bash -c "echo 'cd /home/debian/gitian-builder; cmd=\"./bin/gbuild --skip-image --allow-sudo --commit bitcoin=\$1 --url bitcoin=\$2 ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml\"; echo \$cmd; \${cmd}&' >> /home/debian/runit.sh"
-RUN bash -c "echo 'while [ ! -e \"var/build.log\" ];' >> /home/debian/runit.sh"
-RUN bash -c "echo 'do' >> /home/debian/runit.sh"
-RUN bash -c "echo 'sleep 1' >> /home/debian/runit.sh"
-RUN bash -c "echo 'done' >> /home/debian/runit.sh"
-RUN bash -c "echo 'tail -f var/build.log' >> /home/debian/runit.sh"
-RUN bash -c "chmod +x /home/debian/runit.sh"
+RUN ssh-keygen -t rsa -N '' -f /home/debian/.ssh/id_rsa && \
+echo "alias ssh='ssh -oStrictHostKeyChecking=no'" >> /home/debian/.bashrc && \
+echo '#!/bin/bash' > /home/debian/runit.sh && \
+echo 'set -e' >> /home/debian/runit.sh && \
+echo '[[ -d /home/debian/shared/gitian-builder ]] || git clone --depth 1 https://github.com/devrandom/gitian-builder /home/debian/shared/gitian-builder' >> /home/debian/runit.sh && \
+echo '[[ -d /home/debian/shared/bitcoin ]] || git clone --depth 1 https://github.com/bitcoin/bitcoin /home/debian/shared/bitcoin' >> /home/debian/runit.sh && \
+echo 'mkdir -p /home/debian/shared/gitian-builder/var' >> /home/debian/runit.sh && \
+echo 'sudo /home/debian/copy_keys' >> /home/debian/runit.sh && \
+echo 'ssh -fN -oExitOnForwardFailure=yes -oStrictHostKeyChecking=no ubuntu@builder -L 2223:localhost:22' >> /home/debian/runit.sh && \
+echo 'cd /home/debian/shared/gitian-builder; cmd="./bin/gbuild --skip-image --allow-sudo --commit bitcoin=$1 --url bitcoin=$2 ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"; echo $cmd; ${cmd}&' >> /home/debian/runit.sh && \
+echo 'while [ ! -e "var/build.log" ];' >> /home/debian/runit.sh && \
+echo 'do' >> /home/debian/runit.sh && \
+echo '  sleep 1' >> /home/debian/runit.sh && \
+echo 'done' >> /home/debian/runit.sh && \
+echo 'tail -f var/build.log' >> /home/debian/runit.sh && \
+chmod +x /home/debian/runit.sh

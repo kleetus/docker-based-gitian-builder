@@ -1,20 +1,18 @@
 FROM ubuntu:trusty
 MAINTAINER Chris Kleeschulte <chrisk@bitpay.com>
-RUN useradd -d /home/ubuntu -m -s /bin/bash ubuntu
-RUN mkdir -p -m0755 /var/run/sshd
-RUN bash -c "mkdir -p /home/ubuntu/.ssh && \
+RUN useradd -d /home/ubuntu -m -s /bin/bash ubuntu && \
+mkdir -p -m0755 /var/run/sshd && \
+mkdir -p /home/ubuntu/.ssh && \
 mkdir -p /root/.ssh && \
-ln -s /shared/id_rsa.pub /home/ubuntu/.ssh/authorized_keys && \
-ln -s /shared/root_id_rsa.pub /root/.ssh/authorized_keys && \
-chown -R ubuntu.ubuntu /home/ubuntu/.ssh"
-RUN apt-get update && \
+chown -R ubuntu.ubuntu /home/ubuntu/.ssh && \
+apt-get update && \
 DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -yq install \
 locales \
 build-essential \
 openssh-server \
-rsync
-RUN bash -c "sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config"
-RUN bash -c "locale-gen en_US.UTF-8"
-RUN bash -c "update-locale LANG=en_US.UTF-8"
+rsync && \
+sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+locale-gen en_US.UTF-8 && \
+update-locale LANG=en_US.UTF-8
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
