@@ -7,13 +7,13 @@ services:
       dockerfile: Dockerfile.builder
     image: builder
     container_name: builder
-    expose:
-      - 22 
-    hostname: builder
-    command: ["/usr/sbin/sshd", "-D"] 
     volumes:
-      - ./shared/root_pubkey:/root/.ssh
-      - ./shared/ubuntu_pubkey:/home/ubuntu/.ssh
+      - /pubkey
+      - /privkey
+    expose:
+      - 22
+    hostname: builder
+    command: ["/root/runit.sh"]
   driver:
     build:
       context: .
@@ -24,12 +24,12 @@ services:
     working_dir: '/home/debian'
     command: ["/home/debian/runit.sh"]
     image: driver
-    container_name: driver 
+    container_name: driver
     depends_on:
-      - builder
-    links:
       - builder
     volumes:
       - ./shared:/home/debian/shared
+    volumes_from:
+      - builder
     hostname: driver
     user: debian
