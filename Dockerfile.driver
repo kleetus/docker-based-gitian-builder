@@ -2,6 +2,7 @@ FROM debian:stable
 MAINTAINER Chris Kleeschulte <chrisk@bitpay.com>
 ARG commit
 ARG url
+ARG config
 RUN useradd -d /home/debian -m -s /bin/bash debian
 WORKDIR /home/debian
 RUN apt-get update && \
@@ -35,7 +36,7 @@ echo 'mkdir -p /home/debian/shared/gitian-builder/var' >> /home/debian/runit.sh 
 echo 'rm -fr /home/debian/shared/gitian-builder/var/build.log' >> /home/debian/runit.sh && \
 echo 'sudo /home/debian/copy_keys' >> /home/debian/runit.sh && \
 echo 'ssh -fN -oExitOnForwardFailure=yes -oStrictHostKeyChecking=no ubuntu@builder -L 2223:localhost:22' >> /home/debian/runit.sh && \
-echo "cd /home/debian/shared/gitian-builder; cmd=\"./bin/gbuild --skip-image --allow-sudo --commit bitcoin=$commit --url bitcoin=$url ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml\"; echo \$cmd; \${cmd}&" >> /home/debian/runit.sh && \
+echo "cd /home/debian/shared/gitian-builder; cmd=\"./bin/gbuild --skip-image --allow-sudo --commit bitcoin=$commit --url bitcoin=$url $config\"; echo \$cmd; \${cmd}&" >> /home/debian/runit.sh && \
 echo 'while [ ! -e "var/build.log" ];' >> /home/debian/runit.sh && \
 echo 'do' >> /home/debian/runit.sh && \
 echo '  sleep 1' >> /home/debian/runit.sh && \

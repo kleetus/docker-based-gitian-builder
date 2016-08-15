@@ -21,6 +21,7 @@ services:
       args:
         - commit
         - url
+        - config
     working_dir: '/home/debian'
     command: ["/home/debian/runit.sh"]
     image: driver
