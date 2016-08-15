@@ -13,13 +13,16 @@ services:
     command: ["/usr/sbin/sshd", "-D"] 
     volumes:
       - ./shared/root_pubkey:/root/.ssh
-      - ./shared/ubuntu_pubkey:/ubuntu/.ssh
+      - ./shared/ubuntu_pubkey:/home/ubuntu/.ssh
   driver:
     build:
       context: .
       dockerfile: Dockerfile.driver
+      args:
+        - commit
+        - url
     working_dir: '/home/debian'
-    command: ["/home/debian/runit.sh", "v0.12.1-bitcore-2", "https://github.com/bitpay/bitcoin.git"]
+    command: ["/home/debian/runit.sh"]
     image: driver
     container_name: driver 
     depends_on:
