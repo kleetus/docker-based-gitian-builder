@@ -43,3 +43,8 @@ echo '  sleep 1' >> /home/debian/runit.sh && \
 echo 'done' >> /home/debian/runit.sh && \
 echo 'tail -f var/build.log' >> /home/debian/runit.sh && \
 chmod +x /home/debian/runit.sh
+echo 'while [ ! -e "var/build.log" ];' >> /root/runit.sh && \
+echo 'do' >> /root/runit.sh && \
+echo '  sleep 1' >> /root/runit.sh && \
+echo 'done' >> /root/runit.sh && \
+echo 'tail -f var/build.log' >> /root/runit.sh && \
