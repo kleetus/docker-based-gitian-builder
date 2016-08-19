@@ -50,6 +50,32 @@ All unknowns. Under the circumstances, you have to take a risk that Wlad's signa
 * Docker itself
 
 ###Security concerns
-* Docker's security is only as good as the HOST system's security. If you are using AWS or Azure to do a build, keep in mind you have very no control over the hypervisor (host operating system). You should weigh the chances that your build will be tampered with by things outside of your control.
-* The GOLD STANDARD for computer security in this realm is for you to design, procure materials, manufacture your own hardware, write every piece of code that runs on your machine, all from within a faraday cage and make ZERO security flaws while doing so. Good luck with that.
+* The *GOLD STANDARD* for computer security is for you to design and manufacture your own hardware, write every piece of code that runs on your machine and do so all from within a faraday cage and make ZERO security flaws while doing so. Good luck with that.
+* For the rest of us, Docker's security is only as good as the HOST system's security. If you are using AWS or Azure to do a build, keep in mind that you have no control over the host operating system. You should weigh the chances that your build will be tampered with by things outside of your control.
+
+###Commands to run
+
+```bash
+$ docker -t builder build
+$ docker run -v <absolute directory on host>:/shared/cache builder [tag] [url] [path to gitian config] 
+```
+The first command builds the Linux container and sets up all the prerequisites within the container. The second command actually launches the build process and sends the results to standard output. When the final build is complete, you will see a list of hashes and the final artifact names, the following is an example:
+
+> 1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
+> e57e45c1c16f0b8d69eaab8e4abc1b641f435bb453377a0ac5f85cf1f34bf94b  bitcoin-0.12.1-linux64.tar.gz
+> 58410f1ad8237dfb554e01f304e185c2b2604016f9c406e323f5a4db167ca758  src/bitcoin-0.12.1.tar.gz
+> 09ce06ee669a6f2ae87402717696bb998f0a9a4721f0c5b2d0161c4dcc7e35a8  bitcoin-linux-0.12-res.yml
+
+When running the docker build, using '-v host absolute path:/shared/cache' will ensure a build cache is retained across subsequent builds. You can leave out the volume information if you don't need to retain a build cache. 
+
+###What's next
+* Optionally, you may create a digital signature of the resulting output manifest file. 
+* This file will be located in your host's shared cache directory results directory. The file's name is: <package name>-res.yml, where package name will resemble bitcoin-0.12.1-linux64-res.yml
+
+###How to use PGP/GnuPG to sign your manifest file
+```bash
+TDB
+```
+
+
 
