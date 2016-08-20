@@ -24,12 +24,9 @@ chown root.root /etc/sudoers.d/ubuntu && \
 chmod 0400 /etc/sudoers.d/ubuntu && \
 chown -R ubuntu.ubuntu /home/ubuntu
 USER ubuntu
-RUN printf "[[ -d /home/ubuntu/shared/bitcoin ]] || \
-git clone -b \$1 --depth 1 \$2 /home/ubuntu/shared/bitcoin && \
+RUN printf "[[ -d /shared/bitcoin ]] || \
+git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
 cd /shared/gitian-builder; \
 ./bin/gbuild --skip-image --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh
-CMD ["v0.12.1-bitcore-2",
-     "https://github.com/bitpay/bitcoin.git",
-     "../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
+CMD ["v0.12.1-bitcore-3","https://github.com/bitpay/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-osx.yml"]
 ENTRYPOINT ["bash", "/home/ubuntu/runit.sh"]
-#./bin/gbuild --skip-image --allow-sudo --commit bitcoin=v0.12.1-bitcore-2 --url bitcoin=https://github.com/bitpay/bitcoin ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml
