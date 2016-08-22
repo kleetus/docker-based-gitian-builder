@@ -70,13 +70,12 @@ All unknowns. Under the circumstances, you have to take a risk that Wlad's signa
 ###Commands to run
 
 ```bash
-$ docker -t builder build .
+$ docker build -t builder .
 $ docker run \
--v <absolute directory on host to cache>:/shared/cache \
--v <absolute directory on host to result>:/shared/result \
+-v `pwd`/cache:/shared/cache \
+-v `pwd`/result:/shared/result \
 builder [tag] [url] [path to gitian config] 
 ```
-
 The first command builds the Linux container and sets up all the prerequisites within the container. The second command actually launches the build process and sends the results to standard output. When the final build is complete, you will see a list of hashes and the final artifact names, the following is an example:
 
 > 1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
