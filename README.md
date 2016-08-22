@@ -89,7 +89,7 @@ When running the docker build, using '-v host absolute path:/shared/cache' will 
 
 ###What's next
 * Optionally, you may create a digital signature of the resulting output manifest file. 
-* This file will be located in your host's shared cache directory results directory. The file's name is: <package name>-res.yml, where package name will resemble bitcoin-0.12.1-linux64-res.yml
+* This file will be located in your host's shared cache directory results directory. The file's name is: package name-res.yml, where package name will resemble bitcoin-0.12.1-linux64-res.yml
 
 ###How to use PGP/GnuPG to sign your manifest file
 1. Fork the following repository in GitHub and then clone your fork:
@@ -112,3 +112,5 @@ $ cd /tmp/gitian.sigs
 $ git add . && git commit -m "v0.12.1-bitcore-3"
 $ git push origin master
 ```
+
+##TODO How to audit the build process
