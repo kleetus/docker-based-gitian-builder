@@ -87,6 +87,21 @@ If you don't specify tag, url, or path to gitian config, then the docker run com
 
 When running the docker build, using '-v host absolute path:/shared/cache' will ensure a build cache is retained across subsequent builds. Subsequently, using '-v host absolute path:/shared/result' will ensure that final manifests and binaries are available to you from your host system. You can leave out the volume information if you don't need to retain a build cache or results. If you do use a shared cache and/or result directory, please ensure it is readable and writeable by the user running the container. Changing ownership for these directories is host operating system specific. For Mac OS X, it is usually sufficient to ensure the user that runs 'docker run' owns cache and result directory and can also write to those directories as well.
 
+###Building binaries for Mac OS X
+
+When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. Here are the directions for obtaining this tarball:
+
+1. Register and download the Apple SDK: see OS X readme for details.
+
+> https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_6.1.1/xcode_6.1.1.dmg
+
+Using a Mac, create a tarball for the 10.9 SDK and copy it to your shared cache directory:
+
+```bash
+$ tar -C /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ -czf MacOSX10.9.sdk.tar.gz MacOSX10.9.sdk
+$ cp MacOSX10.9.sdk.tar.gz cache/
+```
+
 ###What's next
 * Optionally, you may create a digital signature of the resulting output manifest file. 
 * This file will be located in your host's shared cache directory results directory. The file's name is: package name-res.yml, where package name will resemble bitcoin-0.12.1-linux64-res.yml
