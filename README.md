@@ -15,13 +15,13 @@ It turns out that distributing software has many security-related challenges. On
 
 Recent news has pointed out a dire [security warning](https://bitcoin.org/en/alert/2016-08-17-binary-safety) highlighting the stakes. It is absolutely imperative that we have easy-to-use tools for detection of malfeasance.
 
-IMPORTANT: Although this project aims to automate and ease the pain of creating deterministic builds, it DOES NOT relinquish its users from understanding exactly what is happening during the build and the construction of the build environment. It is very important to carefully audit the process by which all the relevant pieces come together to produce the final artifact, the manifest files, and the final signature file. It is also important to culivate your personal [Web of Trust](https://en.wikipedia.org/wiki/Web_of_trust) provided that you decide to share your final manifest and corresponding signature. The degree to which people trust your digital signature lends credibility to offered binaries.
+IMPORTANT: Although this project aims to automate and ease the pain of creating deterministic builds, it DOES NOT relinquish its users from understanding exactly what is happening during the build and the construction of the build environment. It is very important to carefully audit the process by which all the relevant pieces come together to produce the final artifact, the manifest files, and the final signature file. It is also important to cultivate your personal [Web of Trust](https://en.wikipedia.org/wiki/Web_of_trust) provided that you decide to share your final manifest and corresponding signature. The degree to which people trust your digital signature lends credibility to offered binaries.
 
-###Real life use case, demostrating the security challenge
+###Real life use case, demonstrating the security challenge
 
 ####Example 1
 
-If I, for instance, clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) on to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following about the source code:
+If I, for instance, clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following about the source code:
 
 1. It was not tampered with by GitHub company or their agents.
 2. It was not tampered with by a third party with back doors into TLS.
@@ -31,7 +31,7 @@ If I, for instance, clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) on 
 6. That my internet service provider isn't creating a transparent proxy and performing a man-in-the-middle attack of some kind.
 7. There isn't a zero day security flaw in any key software being applied. 
 
-Knowing all of this, I have to decide if its likely that I will receive software that intends to do me harm.
+Knowing all of this, I have to decide if it's likely that I will receive software that intends to do me harm.
 
 ####Example 2
 
