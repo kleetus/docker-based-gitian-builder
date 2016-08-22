@@ -21,14 +21,14 @@ IMPORTANT: Although this project aims to automate and ease the pain of creating 
 
 ####Example 1
 
-If I, for instance, clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) on to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following aboutthe source code that I just downloaded:
+If I, for instance, clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) on to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following about the source code:
 
 1. It was not tampered with by GitHub company or their agents.
 2. It was not tampered with by a third party with back doors into TLS.
 3. It was not tampered with by parties that are also installed Certificate Authorities or their agents.
 4. That my own build system has not been compromised in any way such that it could affect the security of the final artifact.
 5. The dns system used to resolve names to ip addresses hasn't been tampered with.
-6. That my internet service provider isn't creating a transparent proxy and performing a man-in-the-middle attackof some kind.
+6. That my internet service provider isn't creating a transparent proxy and performing a man-in-the-middle attack of some kind.
 7. There isn't a zero day security flaw in any key software being applied. 
 
 Knowing all of this, I have to decide if its likely that I will receive software that intends to do me harm.
@@ -37,7 +37,7 @@ Knowing all of this, I have to decide if its likely that I will receive software
 
 The Tor Project
 
-In January of 2014, a developer of [The Tor Project](https://www.torproject.org) reported that a keyboard that she purchased from Amazon may have been shipped to a location where it was tampered with before finally [reaching her](https://twitter.com/puellavulnerata/status/426597381727989760/photo/1). Of course, we can't know for sure what really happened to the keyboard, we'll need to take the Tor developer's word, but the attack vector stands out like a sore thumb. If the keyboard was tampered with, it is a good bet that the reason was to capture the signing credentials of a key person in this project. If this was done, then the attacker could offer unsuspecting users software that was manipulated as this developer. Even if the users did everything right by using the commonly accepted security checks (e.g. downloading and verifying the signature of the Tor artifacts), the signature would be valid, yet compromised at the same time. Until the developer realized her private keys and passphrases had been compromised, ALL of her users would be at risk. 
+In January of 2014, a developer of [The Tor Project](https://www.torproject.org) reported that a keyboard that she purchased from Amazon may have been shipped to a location where it was tampered with. The keyboard finally reached her, but the tracking information [was peculiar](https://twitter.com/puellavulnerata/status/426597381727989760/photo/1). Of course, we can't know for sure what really happened to the keyboard, we'll need to take the Tor developer's word, but the attack vector stands out like a sore thumb. If the keyboard was tampered with, it is a good bet the reason was to capture the signing credentials of a key person on this project. The attacker could offer unsuspecting users software that was tampered with. Even if the users did everything right by using the commonly accepted security checks (e.g. downloading and verifying the signature of the Tor artifacts), the signature would be valid, yet compromised at the same time. Until the developer realized her private keys and passphrases had been compromised, ALL of her users would be at risk. 
 
 ###There is safety in numbers
 If many people in the community are producing deterministic builds and comparing their results, then the likelihood of _ALL_ builders being compromised is very small. Each builder is tasked with their own code review, on their own system. The more reviewers and builders, the greater confidence in the final result. This docker-based gitian-builder aims to make it easier for people to complete the final build.
@@ -84,7 +84,7 @@ The first command builds the Linux container and sets up all the prerequisites w
 > 58410f1ad8237dfb554e01f304e185c2b2604016f9c406e323f5a4db167ca758  src/bitcoin-0.12.1.tar.gz
 > 09ce06ee669a6f2ae87402717696bb998f0a9a4721f0c5b2d0161c4dcc7e35a8  bitcoin-linux-0.12-res.yml
 
-If you don't specify [tag], [url], or [path to gitian config], then the docker run command will use the defaults located in the Dockerfile 'CMD' value. Keep in mind the 'config' value is a path in the container, not on the host system. The bitcoin directory is located in /shared/bitcoin, this means the config would be in /shared/bitcoin/contrib/gitian-descriptor. You may also use a relative path to the gitian-builder directory. The gitian-builder is located in /shared/gitian-builder, so the config value could be '../bitcoin/contrib/gitian-descriptor/gitian-linux.yml'.
+If you don't specify tag, url, or path to gitian config, then the docker run command will use the defaults located in the Dockerfile 'CMD' value. Keep in mind the 'config' value is a path in the container, not on the host system. The bitcoin directory is located in /shared/bitcoin, this means the config would be in /shared/bitcoin/contrib/gitian-descriptor. You may also use a relative path to the gitian-builder directory. The gitian-builder is located in /shared/gitian-builder, so the config value could be '../bitcoin/contrib/gitian-descriptor/gitian-linux.yml'.
 
 When running the docker build, using '-v host absolute path:/shared/cache' will ensure a build cache is retained across subsequent builds. Subsequently, using '-v host absolute path:/shared/result' will ensure that final manifests and binaries are available to you from your host system. You can leave out the volume information if you don't need to retain a build cache or results. If you do use a shared cache and/or result directory, please ensure it is readable and writeable by the user running the container. Changing ownership for these directories is host operating system specific. For Mac OS X, it is usually sufficient to ensure the user that runs 'docker run' owns cache and result directory and can also write to those directories as well.
 
