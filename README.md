@@ -114,3 +114,6 @@ $ git push origin master
 ```
 
 ##TODO How to audit the build process
+##TODO What if the gitian-builder input script (see config script above) needs sudo access during its build process?
+##TODO Offline builds
+##TODO How to read the resulting manifest file
