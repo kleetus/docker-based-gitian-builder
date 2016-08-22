@@ -92,11 +92,11 @@ When running the docker build, using '-v host absolute path:/shared/cache' will 
 * This file will be located in your host's shared cache directory results directory. The file's name is: package name-res.yml, where package name will resemble bitcoin-0.12.1-linux64-res.yml
 
 ###How to use PGP/GnuPG to sign your manifest file
-1. Fork the following repository in GitHub and then clone your fork:
+* Fork the following repository in GitHub and then clone your fork:
 
 > https://github.com/bitpay/gitian.sigs
 
-2. Copy your result files into your fork and sign them. The following example would assume your results file was called: bitcoin-linux-0.12-res.yml and it is located in /tmp/result and your forked and cloned gitian.sigs directory is located in /tmp/gitian.sigs and your signing name is 'user'.
+* Copy your result files into your fork and sign them. The following example would assume your results file was called: bitcoin-linux-0.12-res.yml and it is located in /tmp/result and your forked and cloned gitian.sigs directory is located in /tmp/gitian.sigs and your signing name is 'user'.
 
 ```bash
 $ git clone https://github.com/user/gitian.sigs /tmp/gitian.sigs
@@ -105,7 +105,7 @@ $ cp /tmp/result/bitcoin-linux-0.12-res.yml !$/bitcoin-linux-0.12-build.assert
 $ gpg -b $! 
 ```
 
-3. Add, commit and push your fork back to your repo and submit a merge request against https://github.com/bitpay/gitian.sigs
+* Add, commit and push your fork back to your repo and submit a merge request against https://github.com/bitpay/gitian.sigs
 
 ```bash
 $ cd /tmp/gitian.sigs
