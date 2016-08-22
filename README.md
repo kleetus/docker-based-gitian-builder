@@ -91,9 +91,9 @@ When running the docker build, using '-v host absolute path:/shared/cache' will 
 
 When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. Here are the directions for obtaining this tarball:
 
-1. Register and download the Apple SDK: see OS X readme for details.
+1. Register and download the Apple SDK: see OS X [readme](https://github.com/bitpay/bitcoin/blob/0.12.1-bitcore/doc/README_osx.txt) for details.
 
-> https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_6.1.1/xcode_6.1.1.dmg
+> [https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_6.1.1/xcode_6.1.1.dmg](https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_6.1.1/xcode_6.1.1.dmg)
 
 Using a Mac, create a tarball for the 10.9 SDK and copy it to your shared cache directory:
 
