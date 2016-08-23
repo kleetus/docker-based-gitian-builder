@@ -21,7 +21,7 @@ IMPORTANT: Although this project aims to automate and ease the pain of creating 
 
 ####Example 1
 
-If I, for instance, clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following about the source code:
+For instance, If I clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following about the source code:
 
 1. It was not tampered with by GitHub company or their agents.
 2. It was not tampered with by a third party with back doors into TLS.
@@ -128,7 +128,33 @@ $ git add . && git commit -m "v0.12.1-bitcore-3"
 $ git push origin master
 ```
 
-##TODO How to audit the build process
+###How to audit the build process
+
+The idea behind Docker is to abstract [Linux Containers](https://linuxcontainers.org/) from the type of host operating system. This means that, by using Docker, it doesn't matter if your native operating system is Mac OS X, Linux or Windows, you can still operate a Linux Container and run your code within that. Docker works out how to interact with the host operating system on behalf of the container. If you are operating Linux and then Docker's job is fairly straight-forward, Linux Containers are already natively supported. On Mac and Windows, Docker provides 2 separate options for each operating system. On Mac, you have a choice of "Docker Toolbox" and "Docker for Mac". 
+
+Docker Toolbox uses [VirtualBox](https://www.virtualbox.org/wiki/Downloads) to run a stripped down Linux hypervisor virtual machine called "default". This virtual machine uses [busybox](https://busybox.net/) for most of its utilities and is not directly interacted with by Docker users. Docker users, instead, use the 'docker' command to direct Virtual Box and this default image to build a Linux Container with the target code. So, in effect, you are running a VM within a VM. A Linux container runs witin another VM hosted by VirtualBox. The advantage of this setup is that the hypervisors are compartmentilized and easily manipulated. You may even have multiple 'docker-machines' apart from 'default'. The disadvantage is speed. Being abtracted away from the hardware means more translation and slower execution. Granted, you can optimize Virtual Box to your hardware, but the default settings are not optimal. 
+
+Docker for Mac uses Apple's new [Hypervisor Framework](https://developer.apple.com/library/mac/documentation/DriversKernelHardware/Reference/Hypervisor/) instead of VirtualBox. Docker wrote software against this C API to run the Linux container in user land directly against the hardware. The advantages are speed and simplicity because you don't need VirtualBox anymore. The disadvantage, at the time of this writing, is the persistent copy-on-write image retained by Docker's internal workings. The image layers created by your docker builds accumulate here, but never get purged until you do this manually. Otherwise, this is a good option for Mac users.
+
+On the Windows side, there are also 2 separate options: Docker Toolbox and Docker for Windows. Docker Toolbox on the Windows platforms is almost identical to Docker Toolbox on Mac. It uses VirtualBox in the same way. Docker for Windows requires 64bit Windows 10 Pro, Enterprise and Education (1511 November update, Build 10586 or later) and Microsoft Hyper-V. I haven't personally used this option for Docker because I don't have Windows 10 Pro version, so I can't speak to its advantages or disadvantages.
+
+Docker for Linux is distributed by Linux vendors such as Debian, Ubuntu, Fedora, Red Hat Enterprise Linux, [and others](https://docs.docker.com/engine/installation/linux/). You can also get [binaries](https://docs.docker.com/engine/installation/binaries/) here. But, we aren't about using random binaries here, so please be wary. Trusting Debian to give you a legit copy of Docker encompasses some element of risk just like anything else. 
+
+For source code build, please see: [https://github.com/docker/docker](https://github.com/docker/docker)
+
+Once you have Docker and this project:
+
+1. Edit the Dockerfile and take a look at what statements are included. Use [this guide](https://docs.docker.com/engine/reference/builder/) to examine the statements and what they mean.
+2. Pay special attention to use the of 'sudo' in the Dockerfile. This means the command that comes after the sudo call needs root privilege to perform its function.
+3. Pay close attention to adding files to /etc/sudoers.d directory. This also raises the privileges to functions within these files. In our case, we added a file to allow gitian-builder to perform apt-get so that it can install dependencies and then also run dpkg-query to get the hashes of those dependencies for the final output manifest. We are limiting root functionality to those things only. This is very important because gitian builder needs to set up its build environment, but shouldn't need full root access. Then, later, when gitian-builder accepts a config file that contains a script from bitcoin, it also should not need to be root. We should practice principle of least privilege as much as possible.
+4. Check out the dependencies that are being installed. Are they really needed or did the author forget to remove unneeded items?
+5. The 'ENTRYPOINT' key shows us what script or command will be run when you run 'docker run'. This makes the docker container a self-contained executable. The 'CMD' values are the default parameters to the command in ENTRYPOINT. If you execute 'docker run arg1 arg2 arg3', then arg1, arg2, arg3 override the default parameters in CMD. So, this is how you perform a build for mac:
+
+```bash
+$ docker run v0.12.1-bitcore-3 https://github.com/bitpay/bitcoin ../bitcoin/contrib/gitian-builder/gitian-osx.yml
+```
+The Dockerfile is the key piece to audit here. Provided that you trust Docker to give you a legitimate copy of Ubuntu (the value of the FROM key in the Dockerfile), then the next step is making sure you agree with what the Dockerfile is doing.
+
 ##TODO What if the gitian-builder input script (see config script above) needs sudo access during its build process?
 ##TODO Offline builds
 ##TODO How to read the resulting manifest file
