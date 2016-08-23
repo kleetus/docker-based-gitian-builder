@@ -155,6 +155,41 @@ $ docker run v0.12.1-bitcore-3 https://github.com/bitpay/bitcoin ../bitcoin/cont
 ```
 The Dockerfile is the key piece to audit here. Provided that you trust Docker to give you a legitimate copy of Ubuntu (the value of the FROM key in the Dockerfile), then the next step is making sure you agree with what the Dockerfile is doing.
 
-##TODO What if the gitian-builder input script (see config script above) needs sudo access during its build process?
-##TODO Offline builds
+###What if gitian builder or the script located within the gitian config needs root access (sudo)?
+Generally, it is a bad idea to give anyone outside the hypervisor itself root access in the linux container. But, if there is no other way, then you can add a file to /etc/sudoers.d directory. This is done by editing the Dockerfile and performing a rebuild of the docker image.
+
+For example, if I need to allow a non-privileged user to cat any file on the system, then I would add 'cat' to the list commands available to the ubuntu user in the Dockerfile.
+
+1. Edit the Dockerfile. 
+2. Replace the line: 'echo 'ubuntu ALL=(root) NOPASSWD:/usr/bin/apt-get,/shared/gitian-builder/target-bin/grab-packages.sh' > /etc/sudoers.d/ubuntu && \'
+3. With the line: 'echo 'ubuntu ALL=(root) NOPASSWD:/usr/bin/apt-get,/shared/gitian-builder/target-bin/grab-packages.sh,/bin/cat' > /etc/sudoers.d/ubuntu && \'
+4. Save the file and: 
+
+```bash
+$ docker build -t builder .
+```
+
+##Offline builds
+
+It is a good idea to perform your builds while your host operating system and container are off the network (Internet or otherwise). This is one less attack surface to expose. The strategy would be to gather all the required dependencies, remove any ethernet cables and turn off the wifi connection and begin the build process.
+
+Step 1: build your docker image:
+```bash
+$ docker build -t builder .
+```
+
+Step 2: checkout bitcoin to the root of this project (where the Dockerfile is):
+```bash
+$ git clone https://github.com/bitpay/bitcoin
+```
+
+Step 3: disconnect wired and wireless network connections:
+
+TODO what to do about gitian needing to run apt-get install for packages in gitian config
+
+Step 4: run the container using bitcoin as shared volume:
+```bash
+$ docker run -v `pwd`/bitcoin:/shared/bitcoin builder
+```
+
 ##TODO How to read the resulting manifest file
