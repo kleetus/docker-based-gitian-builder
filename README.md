@@ -192,4 +192,14 @@ Step 4: run the container using bitcoin as shared volume:
 $ docker run -v `pwd`/bitcoin:/shared/bitcoin builder
 ```
 
-##TODO How to read the resulting manifest file
+###How to read the resulting manifest file
+
+The manifest file created after the build is complete will resemble: package-name-res.yml. Within this file, there will be 3 sections of importance, out_manifests, in_manifests, and base_manifests.
+
+The out_manifests is a list of output artifacts that were produced by the build and their hashes. This is the most important thing to look at first. If the hashes and binary names match those of builders, then you've successfully recreated a source code build and your resulting binaries are likely unmolested. 
+
+If the hashes differ, then you will need to find out why. This is where the in_manifests come in. The output hashes are created from the output binaries. The output binaries are built based on the dependencies (the input packages). If your input hashes differ from others' input hashes, then the most likely issue is that Ubuntu has released updates to packages contained in your input manifest.
+
+Each time gitian builder builds your packages, it pulls the latest packages needed for the build from Ubuntu. Those packages might be newer than those used by other gitian builders you are comparing results with. The fix for this is either rebuild with the same packages that the other gitian builders used as inputs or ask those same gitian builders to rebuild with the newer inputs. It is a bit harder for you to build with older inputs because they may not be easily available from normal means. Using older inputs is also a bit risky because of the fact that was probably a reason the inputs were updated. It is best to ask for other gitian builders to perform a new build, if possible.
+
+
