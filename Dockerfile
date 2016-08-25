@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 WORKDIR /shared
 RUN apt-get update && \
 apt-get --no-install-recommends -yq install \
+apt-cacher-ng \
 locales \
 git-core \
 build-essential \
@@ -19,12 +20,16 @@ useradd -d /home/ubuntu -m -s /bin/bash ubuntu && \
 chown -R ubuntu.ubuntu /shared/ && \
 chown root.root /shared/gitian-builder/target-bin/grab-packages.sh && \
 chmod 755 /shared/gitian-builder/target-bin/grab-packages.sh && \
-echo 'ubuntu ALL=(root) NOPASSWD:/usr/bin/apt-get,/shared/gitian-builder/target-bin/grab-packages.sh' > /etc/sudoers.d/ubuntu && \
+echo 'ubuntu ALL=(root) NOPASSWD:/usr/bin/apt-get,/shared/gitian-builder/target-bin/grab-packages.sh,/usr/sbin/apt-cacher-ng' > /etc/sudoers.d/ubuntu && \
 chown root.root /etc/sudoers.d/ubuntu && \
 chmod 0400 /etc/sudoers.d/ubuntu && \
-chown -R ubuntu.ubuntu /home/ubuntu
+chown -R ubuntu.ubuntu /home/ubuntu && \
+echo 'Acquire::http::proxy "http://127.0.0.1:3142";' > /etc/apt/apt.conf.d/02proxy
 USER ubuntu
-RUN printf "[[ -d /shared/bitcoin ]] || \
+RUN printf "\
+sudo /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng pidfile=/var/run/apt-cacher-ng/pid SocketPath=/var/run/apt-cacher-ng/socket foreground=0 && \
+sudo apt-get --no-install-recommends -yq install \$( sed -ne '/^packages:/,/[^-] .*/ {/^- .*/{s/\"//g;s/- //;p}}' /shared/bitcoin/contrib/gitian-descriptors/*|sort|uniq )" > /home/ubuntu/cacheit.sh && \
+printf "[[ -d /shared/bitcoin ]] || \
 git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
 cd /shared/gitian-builder; \
 ./bin/gbuild --skip-image --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh

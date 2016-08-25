@@ -1,0 +1,10 @@
+FROM ubuntu:trusty
+MAINTAINER Chris Kleeschulte <chrisk@bitpay.com>
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && \
+apt-get --no-install-recommends -yq install \
+apt-cacher-ng  && \
+apt-get -yq purge grub > /dev/null 2>&1 || true && \
+apt-get -y dist-upgrade
+COPY ./bitcoin/contrib/gitian-descriptors /gitian-descriptors
+

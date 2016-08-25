@@ -1,2 +1,5 @@
-shared/*
+cache/*
+result/*
 *.sh
+bitcoin/*
+!bitcoin/contrib/*
