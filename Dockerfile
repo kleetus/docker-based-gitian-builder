@@ -27,11 +27,16 @@ chown -R ubuntu.ubuntu /home/ubuntu && \
 echo 'Acquire::http::proxy "http://127.0.0.1:3142";' > /etc/apt/apt.conf.d/02proxy
 USER ubuntu
 RUN printf "\
-sudo /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng pidfile=/var/run/apt-cacher-ng/pid SocketPath=/var/run/apt-cacher-ng/socket foreground=0 && \
-sudo apt-get --no-install-recommends -yq install \$( sed -ne '/^packages:/,/[^-] .*/ {/^- .*/{s/\"//g;s/- //;p}}' /shared/bitcoin/contrib/gitian-descriptors/*|sort|uniq )" > /home/ubuntu/cacheit.sh && \
-printf "[[ -d /shared/bitcoin ]] || \
+mode='offlinemode=0' && \ 
+[[ -z \"\$OFFLINE\" ]] || \
+mode='offlinemode=1' && \
+sudo /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng pidfile=/var/run/apt-cacher-ng/pid SocketPath=/var/run/apt-cacher-ng/socket foreground=0 \$mode && \
+[[ -d /shared/bitcoin ]] || \
 git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
+sudo apt-get --no-install-recommends -yq install \$( sed -ne '/^packages:/,/[^-] .*/ {/^- .*/{s/\"//g;s/- //;p}}' /shared/bitcoin/contrib/gitian-descriptors/*|sort|uniq )" > /home/ubuntu/cacheit.sh && \
+printf "\
+bash /home/ubuntu/cacheit.sh && \
 cd /shared/gitian-builder; \
 ./bin/gbuild --skip-image --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh
 CMD ["v0.12.1-bitcore-3","https://github.com/bitpay/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
-ENTRYPOINT ["bash", "/home/ubuntu/runit.sh"]
+ENTRYPOINT ["bash","/home/ubuntu/runit.sh"]
