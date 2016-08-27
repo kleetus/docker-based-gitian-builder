@@ -35,7 +35,7 @@ sudo /usr/sbin/apt-cacher-ng -c /etc/apt-cacher-ng pidfile=/var/run/apt-cacher-n
 git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
 sudo apt-get --no-install-recommends -yq install \$( sed -ne '/^packages:/,/[^-] .*/ {/^- .*/{s/\"//g;s/- //;p}}' /shared/bitcoin/contrib/gitian-descriptors/*|sort|uniq )" > /home/ubuntu/cacheit.sh && \
 printf "\
-bash /home/ubuntu/cacheit.sh && \
+bash /home/ubuntu/cacheit.sh \$1 \$2 && \
 cd /shared/gitian-builder; \
 ./bin/gbuild --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh
 CMD ["v0.12.1-bitcore-3","https://github.com/bitpay/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
