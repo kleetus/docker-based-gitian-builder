@@ -14,7 +14,7 @@ apt-get -yq purge grub > /dev/null 2>&1 || true && \
 apt-get -y dist-upgrade && \
 locale-gen en_US.UTF-8 && \
 update-locale LANG=en_US.UTF-8 && \
-bash -c '[[ -d /shared/gitian-builder ]] || git clone -b alts_for_docker --depth 1 https://github.com/kleetus/gitian-builder /shared/gitian-builder' && \
+bash -c '[[ -d /shared/gitian-builder ]] || git clone -b more-power https://github.com/kleetus/gitian-builder /shared/gitian-builder' && \
 useradd -d /home/ubuntu -m -s /bin/bash ubuntu && \
 chown -R ubuntu.ubuntu /shared/ && \
 chown root.root /shared/gitian-builder/target-bin/grab-packages.sh && \
@@ -28,5 +28,5 @@ RUN printf "[[ -d /shared/bitcoin ]] || \
 git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
 cd /shared/gitian-builder; \
 ./bin/gbuild --skip-image --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh
-CMD ["v0.12.1-bitcore-3","https://github.com/bitpay/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
+CMD ["v0.12.1-bitcore-4","https://github.com/bitpay/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
 ENTRYPOINT ["bash", "/home/ubuntu/runit.sh"]
