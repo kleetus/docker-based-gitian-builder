@@ -24,9 +24,11 @@ chown root.root /etc/sudoers.d/ubuntu && \
 chmod 0400 /etc/sudoers.d/ubuntu && \
 chown -R ubuntu.ubuntu /home/ubuntu
 USER ubuntu
-RUN printf "[[ -d /shared/bitcoin ]] || \
-git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
+RUN printf "if [ -z \"\${COMMIT}\" ]; then COMMIT=master; fi \n\
+if [ -z \"\${URL}\" ]; then URL=https://github.com/bitpay/bitcoin; fi \n\
+if [ -z \"\${CONFIG}\" ]; then CONFIG=../bitcoin/contrib/gitian-descriptors/gitian-linux.yml; fi \n\
+[[ -d /shared/bitcoin ]] || \
+git clone -b \$COMMIT --depth 1 \$URL /shared/bitcoin && \
 cd /shared/gitian-builder; \
-./bin/gbuild --skip-image --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh
-CMD ["v0.12.1-bitcore-4","https://github.com/bitpay/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
+./bin/gbuild --skip-image --commit bitcoin=\$COMMIT --url bitcoin=\$URL \$CONFIG" > /home/ubuntu/runit.sh
 ENTRYPOINT ["bash", "/home/ubuntu/runit.sh"]
