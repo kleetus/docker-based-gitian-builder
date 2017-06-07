@@ -1,3 +1,4 @@
 *.yml
 *.sig
 *.asc
+out
