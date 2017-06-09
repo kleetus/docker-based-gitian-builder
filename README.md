@@ -2,9 +2,9 @@
 
 ## What does this project do?
 
-This project allows you to build software deterministically. It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder)
+This project allows you to build software deterministically. In other words, each time software is compiled, the resulting program should be the same no matter where, when or by whom the task was completed. You would think this would already be the case, but there are a few issues preventing this. The reasons for this aren't super important at this stage, but the consequences of not being able to match your software to everyone else's software ARE VERY IMPORTANT. This project seeks to mitigate those consequences. It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder)
 
-## What are deterministic builds?
+## What are deterministic/reproducible builds?
 
 Deterministic builds produce final binaries that, when hashed, always produce the same hash for all subsequent builds for a given set of inputs. Of the writing of this README, most all build chains produce binaries non-deterministically. The main reason is the inclusion of time stamps and other meta information into the artifact. The gitian-builder project seeks to remove these differences.
 
@@ -23,7 +23,7 @@ IMPORTANT: Although this project aims to automate and ease the pain of creating 
 
 For instance, If I clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) to my build system and compile an executable to become the basis for my bitcoin wallet, then I am choosing to implicitly trust the following about the source code:
 
-1. It was not tampered with by GitHub company or their agents.
+1. It was not tampered with by the GitHub company or their agents.
 2. It was not tampered with by a third party with back doors into TLS.
 3. It was not tampered with by parties that are also installed Certificate Authorities or their agents.
 4. That my own build system has not been compromised in any way such that it could affect the security of the final artifact.
@@ -76,6 +76,12 @@ $ docker run \
 -v `pwd`/result:/shared/result \
 builder [tag] [url] [path to gitian config]
 ```
+You may also alter the script: 'Dockerfile' for the 'tag', 'url' and 'path to gitian config' in the 'CMD' section. Whenever you alter the Docker, be sure to run:
+
+```bash
+docker build -t builder .
+```
+
 The first command builds the Linux container and sets up all the prerequisites within the container. The second command actually launches the build process and sends the results to standard output. When the final build is complete, you will see a list of hashes and the final artifact names, the following is an example:
 
 > 1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
@@ -91,16 +97,20 @@ When running the docker build, using '-v host absolute path:/shared/cache' will 
 
 When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. Here are the directions for obtaining this tarball:
 
-1. Register and download the Apple SDK: see OS X [readme](https://github.com/bitpay/bitcoin/blob/0.12.1-bitcore/doc/README_osx.txt) for details.
+1. Register and download the Apple SDK: see OS X [readme](https://github.com/bitpay/bitcoin/blob/0.12.1-bitcore/doc/README_osx.txt) for details. Refer to the gitian descriptor yaml file to know what MacOSX sdk file is needed. At the time of this writing, it is: MacOSX10.11.sdk
 
-> [https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_6.1.1/xcode_6.1.1.dmg](https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/xcode_6.1.1/xcode_6.1.1.dmg)
+> [https://developer.apple.com/](https://developer.apple.com/)
 
 Using a Mac, create a tarball for the 10.9 SDK and copy it to your shared cache directory:
 
 ```bash
-$ tar -C /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ -czf MacOSX10.9.sdk.tar.gz MacOSX10.9.sdk
-$ cp MacOSX10.9.sdk.tar.gz cache/
+$ tar -C /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ -czf MacOSX10.11.sdk.tar.gz MacOSX10.11.sdk
+$ cp MacOSX10.11.sdk.tar.gz cache/
 ```
+
+### Security Enhanced Linux (SELinux) and general security precautions when using Linux as the host system
+
+I found this page to be very useful: [Docker security practices](https://linux-audit.com/docker-security-best-practices-for-your-vessel-and-containers/)
 
 ### What's next
 * Optionally, you may create a digital signature of the resulting output manifest file.
