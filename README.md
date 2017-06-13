@@ -2,13 +2,13 @@
 
 ## What does this project do?
 
-This project allows you to build software deterministically. In other words, each time software is compiled, the resulting program should be the same no matter where, when or by whom the task was completed. You would think this would already be the case, but there are a few issues preventing this. The reasons for this aren't super important at this stage, but the consequences of not being able to match your software to everyone else's software ARE VERY IMPORTANT. This project seeks to mitigate those consequences. It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder)
+This project allows you to build software deterministically. In other words, each time a given set application is compiled, the resulting program should be the same no matter where, when or by whom the task was completed. You would think this would already be the case, but there are a few issues preventing this. The reasons for this aren't super important, but the consequences of not being able to match your software to everyone else's software ARE VERY IMPORTANT. This project seeks to mitigate those consequences (see the real life use case section). It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder)
 
 ## What are deterministic/reproducible builds?
 
 Deterministic builds produce final binaries that, when hashed, always produce the same hash for all subsequent builds for a given set of inputs. Of the writing of this README, most all build chains produce binaries non-deterministically. The main reason is the inclusion of time stamps and other meta information into the artifact. The gitian-builder project seeks to remove these differences.
 
-To highlight this issue, if you were to compile bitcoin core from source using [these directions](https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md) and then repeat the process a few minutes later and then took a hash of the resulting binaries, they would be different, why? All the same software was used as inputs, Bitcoin itself was pointed to the same tag, what's the problem? The problem is that certain software dependenices of Bitcoin insert meta data like timestamps and file directory paths into the final binary. Therefore, a binary produced at time A will be different than a binary produced at time B. The Debian project has an ambitious project to retroactively patch packages in their archive to enable them to produce deterministic builds. This is a tall order because of the breadth of changes across many packages. Here is the current [status](https://tests.reproducible-builds.org/debian/index_issues.html). Until this project is completed, we need a project such as Gitian-builder and we need source projects to provide Gitian-builder a config file that defines a build script.
+To highlight this issue, if you were to compile bitcoin core from source using [these directions](https://github.com/bitcoin/bitcoin/blob/master/doc/build-unix.md) and then repeat the process a few minutes later and then took a hash of the resulting binaries, they would be different, why? All the same software was used as inputs, Bitcoin itself was pointed to the same tag, what's the problem? The problem is that certain software dependenices of Bitcoin insert meta data like timestamps and file directory paths into the final binary. Therefore, a binary produced at time A will be different than a binary produced at time B. The Debian project has an ambitious project to retroactively patch packages in their archive to enable them to produce deterministic builds. This is a tall order because of the breadth of changes across many packages. Here is the current [status](https://tests.reproducible-builds.org/debian/index_issues.html). Until this project is complete, we need a project such as this one.
 
 ### The current challenge
 It turns out that distributing software has many security-related challenges. One of the main concerns is protecting software from being _tampered with_ before execution on end-users' computer systems.
@@ -25,7 +25,7 @@ For instance, If I clone [Bitcoin Core](https://github.com/bitcoin/bitcoin) to m
 
 1. It was not tampered with by the GitHub company or their agents.
 2. It was not tampered with by a third party with back doors into TLS.
-3. It was not tampered with by parties that are also installed Certificate Authorities or their agents.
+3. It was not tampered with by parties that are also installed Certificate Authorities or their agents (check your list of installed trusted CA's, do you know them all to be completely trust-worthy?).
 4. That my own build system has not been compromised in any way such that it could affect the security of the final artifact.
 5. The dns system used to resolve names to ip addresses hasn't been tampered with.
 6. That my internet service provider isn't creating a transparent proxy and performing a man-in-the-middle attack of some kind.
@@ -37,14 +37,14 @@ Knowing all of this, I have to decide if it's likely that I will receive softwar
 
 The Tor Project
 
-In January of 2014, a developer of [The Tor Project](https://www.torproject.org) reported that a keyboard that she purchased from Amazon may have been shipped to a location where it was tampered with. The keyboard finally reached her, but the tracking information [was peculiar](https://twitter.com/puellavulnerata/status/426597381727989760/photo/1). Of course, we can't know for sure what really happened to the keyboard, we'll need to take the Tor developer's word, but the attack vector stands out like a sore thumb. If the keyboard was tampered with, it is a good bet the reason was to capture the signing credentials of a key person on this project. The attacker could offer unsuspecting users software that was tampered with. Even if the users did everything right by using the commonly accepted security checks (e.g. downloading and verifying the signature of the Tor artifacts), the signature would be valid, yet compromised at the same time. Until the developer realized her private keys and passphrases had been compromised, ALL of her users would be at risk.
+In January of 2014, a developer of [The Tor Project](https://www.torproject.org) reported that a keyboard that she purchased from Amazon may have been shipped to a location where it was tampered with. The keyboard finally reached her, but the tracking information [was peculiar](https://twitter.com/puellavulnerata/status/426597381727989760/photo/1). Of course, we can't know what really happened to the keyboard, we'll need to take the Tor developer's word, but the attack vector stands out like a sore thumb. If the keyboard was tampered with, it is a good bet the reason was to capture the signing credentials of a key person on this project. The attacker could offer unsuspecting users software that was tampered with. Even if the users did everything right by using the commonly accepted security checks (e.g. downloading and verifying the signature of the Tor artifacts), the signature would be valid, yet compromised at the same time. Until the developer realized her private keys and passphrases had been compromised, ALL of her users would be at risk.
 
 ### There is safety in numbers
 If many people in the community are producing deterministic builds and comparing their results, then the likelihood of _ALL_ builders being compromised is very small. Each builder is tasked with their own code review, on their own system. The more reviewers and builders, the greater confidence in the final result. This docker-based gitian-builder aims to make it easier for people to complete the final build.
 
 Deterministic builds give a great deal of confidence to all users regardless of whether or not they themselves have actually done the deterministic build. For example, if I download a binary package and its corresponding text file containing the digests of all the binaries offered for popular platforms and a signature file for the aforementioned text file (a typical strategy), then I can perform the following actions:
 
-1. Use PGP/GnuPG to verify the signature of the text file containing the hashes/digests of my binary. This proves that the text file with your binary's hash hasn't been tampered with provided you trust the person who signed the text file.
+1. Use PGP/GnuPG to verify the signature of the text file containing the hashes/digests of my binary. This proves that the text file with your binary's hash hasn't been tampered with provided you trust the person who signed the text file and that person hasn't lost control of their keys.
 2. Use the same hash function that was used to generate the hash in text file on your downloaded binary and compare the result to the string in the text file. This should prove that your downloaded binary has not been tampered with.
 
 In the case of the Bitcoin Project, you might choose to download the latest version for 64 bit Windows from https://bitcoin.org. You download a file called, bitcoin-0.12.1-win64-setup.exe and then something called "SHA256SUMS.asc" so you can verify signatures. The SHA256SUMS.asc file is a normal text file despite it having a weird 'asc' file extension. If you open this in notepad, you will see SHA256 hashes for all of the Bitcoin binaries offered. Below all of that, you will see the signature, starting with "-----BEGIN PGP SIGNATURE-----". At this point, you can use tools such as [Gpg4Win](https://www.gpg4win.org/) to verify the signature. Gpg4Win can be given the entire SHA256SUMS.asc file as input and it will, most likely, let you know that the signature cannot be verified. The reason for this is that its signer, Wladimir J. van der Laan (Bitcoin Core binary release signing key) at the time of this writing, has no public key installed on your system. Further, if you go out on the Internet and retrieve Wlad's key and repeat the process, you introduce a new set of security concerns:
@@ -55,7 +55,7 @@ In the case of the Bitcoin Project, you might choose to download the latest vers
 4. Have any people that you trust signed this key?
 5. Does Wlad still have custody of his private key that signed SHASUMS.asc?
 
-All unknowns. Under the circumstances, you have to take a risk that Wlad's signature is good to go. But, if you complete your own deterministic build of Bitcoin, you can simply compare the hashes in SHA256SUMS.asc directly.
+All unknowns. Under the circumstances, you have to take a risk that Wlad's signature is good to go. But, if you complete your own deterministic build of Bitcoin, you can simply compare the hashes in SHA256SUMS.asc directly. You can also check if other people have done the same and compare your results to theirs. You can also perform the build process on an air-gapped computer and compare the results.
 
 ## How to use this project?
 
@@ -69,33 +69,57 @@ All unknowns. Under the circumstances, you have to take a risk that Wlad's signa
 
 ### Commands to run
 
+Using the provided convenience scripts:
+
 ```bash
-$ docker build -t builder .
-$ docker run \
--v `pwd`/cache:/shared/cache \
--v `pwd`/result:/shared/result \
-builder [tag] [url] [path to gitian config]
+$ bash build_builder.sh
+$ bash run_builder.sh
 ```
-You may also alter the script: 'Dockerfile' for the 'tag', 'url' and 'path to gitian config' in the 'CMD' section. Whenever you alter the Docker, be sure to run:
+
+Please refer the Dockerfile to inspect what platform will be built.
+
+Example: If the 'CMD' section of the Dockerfile specifies '../bitcoin/contrib/gitian-descriptors/gitian-linux.yml', it will build all linux varieties. This includes 32/64 bit and ARM. Please check the bitcoin repo for other descriptors such as Windows and MacOSX. If you change the descriptor, please re-run:
 
 ```bash
 docker build -t builder .
 ```
 
-The first command builds the Linux container and sets up all the prerequisites within the container. The second command actually launches the build process and sends the results to standard output. When the final build is complete, you will see a list of hashes and the final artifact names, the following is an example:
+The first command (build_builder.sh) builds the Linux container and sets up all the prerequisites within the container. The second command (run_builder.sh) actually launches the build process and sends the results to standard output. When the final build is complete, you will see a list of hashes and the final artifact names, the following is an example:
 
 > 1924cc6e201e0a1729ca0707e886549593d14eab9cd5acb3798d7af23acab3ae  bitcoin-0.12.1-linux32.tar.gz
 > e57e45c1c16f0b8d69eaab8e4abc1b641f435bb453377a0ac5f85cf1f34bf94b  bitcoin-0.12.1-linux64.tar.gz
 > 58410f1ad8237dfb554e01f304e185c2b2604016f9c406e323f5a4db167ca758  src/bitcoin-0.12.1.tar.gz
 > 09ce06ee669a6f2ae87402717696bb998f0a9a4721f0c5b2d0161c4dcc7e35a8  bitcoin-linux-0.12-res.yml
 
-If you don't specify tag, url, or path to gitian config, then the docker run command will use the defaults located in the Dockerfile 'CMD' value. Keep in mind the 'config' value is a path in the container, not on the host system. The bitcoin directory is located in /shared/bitcoin, this means the config would be in /shared/bitcoin/contrib/gitian-descriptor. You may also use a relative path to the gitian-builder directory. The gitian-builder is located in /shared/gitian-builder, so the config value could be '../bitcoin/contrib/gitian-descriptor/gitian-linux.yml'.
+If you don't specify tag, url, or path to gitian config, or use the convenience scripts, then the docker run command will use the defaults located in the Dockerfile 'CMD' value. Keep in mind the 'config' value is a path in the container, not on the host system. The bitcoin directory is located in /shared/bitcoin, this means the config would be in /shared/bitcoin/contrib/gitian-descriptor. You may also use a relative path to the gitian-builder directory. The gitian-builder is located in /shared/gitian-builder, so the config value could be '../bitcoin/contrib/gitian-descriptor/gitian-linux.yml'.
 
 When running the docker build, using '-v host absolute path:/shared/cache' will ensure a build cache is retained across subsequent builds. Subsequently, using '-v host absolute path:/shared/result' will ensure that final manifests and binaries are available to you from your host system. You can leave out the volume information if you don't need to retain a build cache or results. If you do use a shared cache and/or result directory, please ensure it is readable and writeable by the user running the container. Changing ownership for these directories is host operating system specific. For Mac OS X, it is usually sufficient to ensure the user that runs 'docker run' owns cache and result directory and can also write to those directories as well.
 
+### Precautions when using provided convenience scripts
+
+If run_builder.sh is run more than once, it will attempt to create a container with the same name as the previous incarnation of run_builder.sh. This will not work, so you will need to remove old containers that have stopped. There is a convenience script for this called 'remove_all_containers.sh'. Please be aware that this script removes all non-running containers regardless of context. If you have other stopped containers for other things, they get deleted too.
+
+Additionally, there is a convenience script called 'remove_all_images.sh', this will remove all images without regardless for context. Be careful with this one.
+
+There is also a script called 'run_builder_console.sh' that is useful should you want a terminal into your guest operation system. This allows you to run commands manually and inspect the vm. Handy for troubleshooting.
+
+Docker has many wonderful features such as creating a new image from a container's changes. This is the commit function. If there was an error during the execution of a container, you can commit back the container's changes to your image and start a new container with that exact state (very helpful).
+
+```bash
+$ docker commit builder builder:saved
+# then remove old containers
+$ bash ./remove_all_containers.sh
+# then start
+$ docker run -it -h builder --name builder \
+-v $THISDIR/cache:/shared/cache \
+-v $THISDIR/result:/shared/result \
+--entrypoint=/bin/bash \
+builder:saved -s
+```
+
 ### Building binaries for Mac OS X
 
-When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. Here are the directions for obtaining this tarball:
+When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. This project can't supply the MacOSX sdk, it is not allowed by Apple. Here are the directions for obtaining this tarball:
 
 1. Register and download the Apple SDK: see OS X [readme](https://github.com/bitpay/bitcoin/blob/0.12.1-bitcore/doc/README_osx.txt) for details. Refer to the gitian descriptor yaml file to know what MacOSX sdk file is needed. At the time of this writing, it is: MacOSX10.11.sdk
 
@@ -110,7 +134,7 @@ $ cp MacOSX10.11.sdk.tar.gz cache/
 
 ### Security Enhanced Linux (SELinux) and general security precautions when using Linux as the host system
 
-I found this page to be very useful: [Docker security practices](https://linux-audit.com/docker-security-best-practices-for-your-vessel-and-containers/)
+If you run into permissions problems while using Docker on a SE Linux host system, I found this page to be very useful: [Docker security practices](https://linux-audit.com/docker-security-best-practices-for-your-vessel-and-containers/)
 
 ### What's next
 * Optionally, you may create a digital signature of the resulting output manifest file.
@@ -121,21 +145,22 @@ I found this page to be very useful: [Docker security practices](https://linux-a
 
 > https://github.com/bitpay/gitian.sigs
 
-* Copy your result files into your fork and sign them. The following example would assume your results file was called: bitcoin-linux-0.12-res.yml and it is located in /tmp/result and your forked and cloned gitian.sigs directory is located in /tmp/gitian.sigs and your signing name is 'user'.
+* Copy your result files into your fork and sign them. The following example would assume your results file was called: bitcoin-linux-0.14.1.yml and it is located in /tmp/result and your forked and cloned gitian.sigs directory is located in /tmp/gitian.sigs and your signing name is 'user'.
 
 ```bash
 $ git clone https://github.com/user/gitian.sigs /tmp/gitian.sigs
-$ mkdir -p /tmp/gitian.sigs/v0.12.1-bitcore-3-linux/user
-$ cp /tmp/result/bitcoin-linux-0.12-res.yml !$/bitcoin-linux-0.12-build.assert
-$ gpg -b $!
+$ mkdir -p /tmp/gitian.sigs/v0.14.1-linux/user
+$ cp /tmp/result/bitcoin-linux-0.14.1-res.yml !$
+$ gpg -b $!/bitcoin-linux-0.14.1.yml
 ```
 
 * Add, commit and push your fork back to your repo and submit a merge request against https://github.com/bitpay/gitian.sigs
 
 ```bash
 $ cd /tmp/gitian.sigs
-$ git add . && git commit -m "v0.12.1-bitcore-3"
+$ git add . && git commit -m "v0.14.1"
 $ git push origin master
+# submit a merge request to master branch of bitpay/gitian.sigs
 ```
 
 ### How to audit the build process
@@ -158,11 +183,8 @@ Once you have Docker and this project:
 2. Pay special attention to use the of 'sudo' in the Dockerfile. This means the command that comes after the sudo call needs root privilege to perform its function.
 3. Pay close attention to adding files to /etc/sudoers.d directory. This also raises the privileges to functions within these files. In our case, we added a file to allow gitian-builder to perform apt-get so that it can install dependencies and then also run dpkg-query to get the hashes of those dependencies for the final output manifest. We are limiting root functionality to those things only. This is very important because gitian builder needs to set up its build environment, but shouldn't need full root access. Then, later, when gitian-builder accepts a config file that contains a script from bitcoin, it also should not need to be root. We should practice principle of least privilege as much as possible.
 4. Check out the dependencies that are being installed. Are they really needed or did the author forget to remove unneeded items?
-5. The 'ENTRYPOINT' key shows us what script or command will be run when you run 'docker run'. This makes the docker container a self-contained executable. The 'CMD' values are the default parameters to the command in ENTRYPOINT. If you execute 'docker run arg1 arg2 arg3', then arg1, arg2, arg3 override the default parameters in CMD. So, this is how you perform a build for mac:
+5. The 'ENTRYPOINT' key shows us what script or command will be run when you run 'docker run'. This makes the docker container a self-contained executable. The 'CMD' values are the default parameters to the command in ENTRYPOINT. If you execute 'docker run arg1 arg2 arg3', then arg1, arg2, arg3 override the default parameters in CMD.
 
-```bash
-$ docker run v0.12.1-bitcore-3 https://github.com/bitpay/bitcoin ../bitcoin/contrib/gitian-builder/gitian-osx.yml
-```
 The Dockerfile is the key piece to audit here. Provided that you trust Docker to give you a legitimate copy of Ubuntu (the value of the FROM key in the Dockerfile), then the next step is making sure you agree with what the Dockerfile is doing.
 
 ### What if gitian builder or the script located within the gitian config needs root access (sudo)?
