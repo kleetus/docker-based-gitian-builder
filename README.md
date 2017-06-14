@@ -1,5 +1,56 @@
 # Gitian Builder using Docker images and containers.
 
+## TL;DR / Executive Summary
+
+1. Install [docker](https://docker.io) for your platform
+2. Clone or fork [this](https://github.com/kleetus/docker-based-gitian-builder) GH repo
+3. Ensure docker daemon is operating by starting the application. You should be able to run 'docker' at the command line without error.
+4. Run the convenience scripts in this repo:
+
+```bash
+$ bash ./build_builder.sh # installs the base virtual machine (ubuntu 12.04 trusty) and dependencies, takes 5-10 minutes
+$ bash ./run_builder.sh # builds bitcoin itself per the argument to the CMD instruction in Dockerfile, takes 30+ minutes
+```
+
+Repeat the process for Windows and MacOSX targets (these will take less time because common dependencies are cached):
+
+5. Edit the Dockerfile:
+
+```bash
+$ nano Dockerfile # use a text editor that you are comfortable with
+```
+
+6. Change the gitian descriptor in the 'CMD' line (it might say ../bitcoin/contrib/gitian-descriptors/gitian-linux.yml currently) to: ../bitcoin/contrib/gitian-descriptors/gitian-osx.yml or ../bitcoin/contrib/gitian-descriptors/gitian-win.yml
+7. Save the file and rerun:
+
+```bash
+$ bash build_builder.sh
+$ bash run_builder.sh
+```
+
+Please note that you will need the Mac development SDK in order to build for Mac. Please see the sections below about how to get that tarball.
+
+The end result is that you will have a manifest and build artifacts/binaries in the directory 'result/out'.
+
+8. Fork [gitian.sigs](https://github.com/bitpay/gitian.sigs)
+9. Make a directory for the version of bitcoin you just built:
+
+```bash
+$ mkdir -p gitian.sigs/<version such as bitcoin-linux-0.14>/<your name> # you should see prior build examples in the gitian.sigs repo
+$ cp result/<manifest yml> gitian.sigs/<version>/<name>/
+```
+
+10. Sign the yml manifest if you have a gpg key setup for yourself (if not skip this step and go to step 13 to compare manifests):
+
+```bash
+$ gpg -b gitian.sigs/<version>/<name>/<manifest yml>
+```
+
+11. You should have 2 files in the manifest directory, the manifest itself, e.g. bitcoin-linux-0.14.1.yml and the detacted digitial signature, e.g. bitcoin-linux-0.14.1.yml.sig
+12. Commit those directories back to your fork and create a merge request against the master branch of the original project.
+13. If there are other gitian builds done prior to yours, for the same version, compare your manifest file to theirs. They should be the same set of hashes.
+
+
 ## What does this project do?
 
 This project allows you to build software deterministically. In other words, each time a given set application is compiled, the resulting program should be the same no matter where, when or by whom the task was completed. You would think this would already be the case, but there are a few issues preventing this. The reasons for this aren't super important, but the consequences of not being able to match your software to everyone else's software ARE VERY IMPORTANT. This project seeks to mitigate those consequences (see the real life use case section). It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder)
