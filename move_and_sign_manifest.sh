@@ -1,22 +1,32 @@
 #!/bin/bash
 
+easysigning=false
+process_args () {
+  if [[ -n "${1}" ]] && [[ "${1}" == "--easysigning" ]]; then
+    easysigning=true
+  elif [[ -n "${1}" ]] && [[ "${1}" == "-h" || "${1}" == "--help" ]]; then
+    echo "usage: move_and_signing_manifest.sh [--easysigning]"
+    echo ""
+    echo "--easysigning allows you to type your gpg private key passphrase once to sign multiple manifest files."
+    exit 0
+  fi
+}
 
-function get_input_from_user () {
+get_input_from_user () {
   get_user_name
   get_path_to_gitian_sigs
 }
 
 user=
-function get_user_name () {
+get_user_name () {
   default=$(whoami)
-  while [ 1 ]; do
+  if [ -z "${user}" ]; then
     echo -n "Enter desired signing name (default: $default):"
     read user
     if [ -z "${user}" ]; then
       user=$default
     fi
-    break
-  done
+  fi
 }
 
 path_to_gitian_sigs=
@@ -42,8 +52,30 @@ get_build_name () {
   echo ${1/-res.yml/}
 }
 
+check_for_gpg () {
+  hash gpg 2>/dev/null || { echo >&2 "This script requires the 'gpg' program, it may not be installed or not on your path."; exit 1; }
+}
+
+passphrase=
+sign_manifest () {
+  if [[ "${easysigning}" = true ]] && [[ -z "${passphrase}" ]]; then
+    echo -n "Please enter your passphrase for default gpg public key (never use this on a multi-user system): "
+    read -s passphrase
+    echo ""
+  fi
+  echo "Attempting to sign manifest: ${1}"
+  if [ -n "${passphrase}" ]; then
+    gpg --batch --yes -b --passphrase "${passphrase}" "${1}"
+  else
+    gpg -b "${1}"
+  fi
+}
+
 for manifest in result/*.yml; do
-  echo $manifest
+
+  process_args $1
+
+  check_for_gpg
 
   get_input_from_user
 
@@ -54,8 +86,8 @@ for manifest in result/*.yml; do
   mkdir -p "${manifest_dir}"
   cp "${manifest}" "${manifest_dir}"
   manifest_file="${manifest_dir}/${basename}"
-  echo "Attempting to sign manifest: ${manifest_file}"
-  gpg -b "${manifest_file}"
+
+  sign_manifest "${manifest_file}"
 
 done
 
