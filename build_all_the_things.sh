@@ -28,6 +28,8 @@ if [ -n "${2}" ]; then
   repo="${2}"
 fi
 
+$THISDIR/build_builder.sh
+
 platforms=('linux' 'win' 'osx')
 
 for platform in "${platforms[@]}"; do
