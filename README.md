@@ -41,6 +41,7 @@ Please note that you will need the Mac development SDK in order to build for Mac
 The end result is that you will have a manifest and build artifacts/binaries in the directory 'result/out'.
 
 <a name="step8"></a>8. Fork [gitian.sigs](https://github.com/btc1/gitian.sigs)
+
 9. Use the convenience script to add your manifest files and sign them:
 
 ```bash
