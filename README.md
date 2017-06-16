@@ -24,11 +24,12 @@ $ nano Dockerfile # use a text editor that you are comfortable with
 7. Save the file and rerun:
 
 ```bash
+$ bash remove_all_containers.sh # this will remove all stopped/exited containers
 $ bash build_builder.sh
 $ bash run_builder.sh
 ```
 
-Please note that you will need the Mac development SDK in order to build for Mac. Please see the sections below about how to get that tarball.
+Please note that you will need the Mac development SDK in order to build for Mac. Please see the sections [below](#mac_sdk) about how to get that tarball.
 
 The end result is that you will have a manifest and build artifacts/binaries in the directory 'result/out'.
 
@@ -49,6 +50,14 @@ $ gpg -b gitian.sigs/<version>/<name>/<manifest yml>
 11. You should have 2 files in the manifest directory, the manifest itself, e.g. bitcoin-linux-0.14.1.yml and the detacted digitial signature, e.g. bitcoin-linux-0.14.1.yml.sig
 12. Commit those directories back to your fork and create a merge request against the master branch of the original project.
 13. If there are other gitian builds done prior to yours, for the same version, compare your manifest file to theirs. They should be the same set of hashes.
+14. All the binaries built during this process are located in result/out.
+15. To cleanup all files created during this process:
+
+```bash
+$ bash remove_all_containers.sh
+$ bash remove_all_images.sh
+$ rm -fr cache/* result/*
+```
 
 
 ## What does this project do?
@@ -168,7 +177,7 @@ $ docker run -it -h builder --name builder \
 builder:saved -s
 ```
 
-### Building binaries for Mac OS X
+### <a name="mac_sdk"></a>Building binaries for Mac OS X
 
 When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. This project can't supply the MacOSX sdk, it is not allowed by Apple. Here are the directions for obtaining this tarball:
 
