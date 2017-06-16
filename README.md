@@ -7,6 +7,13 @@
 3. Ensure docker daemon is operating by starting the application. You should be able to run 'docker' at the command line without error.
 4. Run the convenience scripts in this repo:
 
+For building Bitcoin for ALL platforms and architectures in one command:
+```bash
+$ bash build_all_the_things.sh # optionally include a branch/tag and repo url e.g. bash build_all_the_things segwit2x https://github.com/btc1/bitcoin
+```
+Once complete, proceed to [step 8](#step8).
+
+For building individual platforms:
 ```bash
 $ bash ./build_builder.sh # installs the base virtual machine (ubuntu 12.04 trusty) and dependencies, takes 5-10 minutes
 $ bash ./run_builder.sh # builds bitcoin itself per the argument to the CMD instruction in Dockerfile, takes 30+ minutes
@@ -33,7 +40,7 @@ Please note that you will need the Mac development SDK in order to build for Mac
 
 The end result is that you will have a manifest and build artifacts/binaries in the directory 'result/out'.
 
-8. Fork [gitian.sigs](https://github.com/bitpay/gitian.sigs)
+<a name="step8"></a>8. Fork [gitian.sigs](https://github.com/btc1/gitian.sigs)
 9. Use the convenience script to add your manifest files and sign them:
 
 ```bash
