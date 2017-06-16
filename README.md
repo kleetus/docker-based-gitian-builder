@@ -34,11 +34,10 @@ Please note that you will need the Mac development SDK in order to build for Mac
 The end result is that you will have a manifest and build artifacts/binaries in the directory 'result/out'.
 
 8. Fork [gitian.sigs](https://github.com/bitpay/gitian.sigs)
-9. Make a directory for the version of bitcoin you just built:
+9. Use the convenience script to add your manifest files and sign them:
 
 ```bash
-$ mkdir -p gitian.sigs/<version such as bitcoin-linux-0.14>/<your name> # you should see prior build examples in the gitian.sigs repo
-$ cp result/<manifest yml> gitian.sigs/<version>/<name>/
+$ bash move_and_sign_manifest.sh
 ```
 
 10. Sign the yml manifest if you have a gpg key setup for yourself (if not skip this step and go to step 13 to compare manifests):
