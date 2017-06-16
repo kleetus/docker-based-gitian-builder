@@ -28,5 +28,5 @@ RUN printf "[[ -d /shared/bitcoin ]] || \
 git clone -b \$1 --depth 1 \$2 /shared/bitcoin && \
 cd /shared/gitian-builder; \
 ./bin/gbuild --skip-image --commit bitcoin=\$1 --url bitcoin=\$2 \$3" > /home/ubuntu/runit.sh
-CMD ["2017_2m_blocksize_v2","https://github.com/btc1/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
+CMD ["segwit2x","https://github.com/btc1/bitcoin.git","../bitcoin/contrib/gitian-descriptors/gitian-linux.yml"]
 ENTRYPOINT ["bash", "/home/ubuntu/runit.sh"]
