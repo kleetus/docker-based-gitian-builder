@@ -5,7 +5,8 @@
 1. Install [docker](https://docker.io) for your platform
 2. Clone or fork [this](https://github.com/kleetus/docker-based-gitian-builder) GH repo
 3. Ensure docker daemon is operating by starting the application. You should be able to run 'docker' at the command line without error.
-4. Run the convenience scripts in this repo:
+4. Building for Mac requires [this step](#building-binaries-for-mac-os-x) to be completed
+5. Run the convenience scripts in this repo:
 
 For building Bitcoin for ALL platforms and architectures in one command:
 ```bash
