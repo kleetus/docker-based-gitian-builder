@@ -54,7 +54,7 @@ $ bash move_and_sign_manifest.sh
 $ gpg -b gitian.sigs/<version>/<name>/<manifest yml>
 ```
 
-11. You should have 2 files in the manifest directory, the manifest itself, e.g. bitcoin-linux-0.14.1.yml and the detacted digitial signature, e.g. bitcoin-linux-0.14.1.yml.sig
+11. You should have 2 files in the manifest directory, the manifest itself, e.g. `bitcoin-linux-#.#.#.yml`, and the detached digital signature, e.g. `bitcoin-linux-#.#.#.yml.sig`.
 12. Commit those directories back to your fork and create a merge request against the master branch of the original project.
 13. If there are other gitian builds done prior to yours, for the same version, compare your manifest file to theirs. They should be the same set of hashes.
 14. All the binaries built during this process are located in result/out.
@@ -69,7 +69,7 @@ $ rm -fr cache/* result/*
 
 ## What does this project do?
 
-This project allows you to build software deterministically. In other words, each time a given set application is compiled, the resulting program should be the same no matter where, when or by whom the task was completed. You would think this would already be the case, but there are a few issues preventing this. The reasons for this aren't super important, but the consequences of not being able to match your software to everyone else's software ARE VERY IMPORTANT. This project seeks to mitigate those consequences (see the real life use case section). It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder)
+This project allows you to build software deterministically. In other words, each time a given set application is compiled, the resulting program should be the same no matter where, when or by whom the task was completed. You would think this would already be the case, but there are a few issues preventing it. The reasons for this aren't super important, but the consequences of not being able to match your software to everyone else's software ARE VERY IMPORTANT. This project seeks to mitigate those consequences (see the real life use case section). It does this by leveraging [Docker](https://docker.io) and [Gitian Builder](https://github.com/devrandom/gitian-builder).
 
 ## What are deterministic/reproducible builds?
 
@@ -188,15 +188,13 @@ builder:saved -s
 
 When building binaries intended to be run on Mac OS X, you MUST supply a SDK tarball to the build chain. This project can't supply the MacOSX sdk, it is not allowed by Apple. Here are the directions for obtaining this tarball:
 
-1. Register and download the Apple SDK: see OS X [readme](https://github.com/bitpay/bitcoin/blob/0.12.1-bitcore/doc/README_osx.txt) for details. Refer to the gitian descriptor yaml file to know what MacOSX sdk file is needed. At the time of this writing, it is: MacOSX10.11.sdk
+1. Register and download the Apple SDK: see OS X [readme](https://github.com/bitpay/bitcoin/blob/0.12.1-bitcore/doc/README_osx.txt) for complete details. The current SDK is: `MacOSX10.11.sdk`, distributed in [**Xcode 7.3.1**](https://developer.apple.com/devcenter/download.action?path=/Developer_Tools/Xcode_7.3.1/Xcode_7.3.1.dmg). Refer to the `files` entry in `bitcoin/contrib/gitian-descriptors/gitian-osx.yml` to verify the macOS SDK required.
 
-> [https://developer.apple.com/](https://developer.apple.com/)
-
-Using a Mac, create a tarball for the 10.9 SDK and copy it to your shared cache directory:
+Using a Mac, mount the disk image and create a tarball for the SDK in your shared cache directory:
 
 ```bash
+$ cd cache/
 $ tar -C /Volumes/Xcode/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/ -czf MacOSX10.11.sdk.tar.gz MacOSX10.11.sdk
-$ cp MacOSX10.11.sdk.tar.gz cache/
 ```
 
 ### Security Enhanced Linux (SELinux) and general security precautions when using Linux as the host system
@@ -205,18 +203,18 @@ If you run into permissions problems while using Docker on a SE Linux host syste
 
 ### What's next
 * Optionally, you may create a digital signature of the resulting output manifest file.
-* This file will be located in your host's shared cache directory results directory. The file's name is: package name-res.yml, where package name will resemble bitcoin-0.12.1-linux64-res.yml
+* This file will be located in your host's shared cache directory results directory. The file's name is: `[PACKAGE NAME]-res.yml`, where package name will resemble `bitcoin-#.#.#-linux64-res.yml`.
 
 ### How to use PGP/GnuPG to sign your manifest file
 * Fork the following repository in GitHub and then clone your fork:
 
 > https://github.com/bitpay/gitian.sigs
 
-* Copy your result files into your fork and sign them. The following example would assume your results file was called: bitcoin-linux-0.14.1.yml and it is located in /tmp/result and your forked and cloned gitian.sigs directory is located in /tmp/gitian.sigs and your signing name is 'user'.
+* Copy your result files into your fork and sign them. The following example would assume your results file was called: `bitcoin-linux-0.14.1.yml` and it is located in /tmp/result and your forked and cloned gitian.sigs directory is located in /tmp/gitian.sigs and your signing name is 'user'.
 
 ```bash
 $ git clone https://github.com/user/gitian.sigs /tmp/gitian.sigs
-$ mkdir -p /tmp/gitian.sigs/v0.14.1-linux/user
+$ mkdir -p /tmp/gitian.sigs/0.14.1-linux/user
 $ cp /tmp/result/bitcoin-linux-0.14.1-res.yml !$
 $ gpg -b $!/bitcoin-linux-0.14.1.yml
 ```
