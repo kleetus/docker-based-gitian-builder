@@ -44,10 +44,13 @@ for platform in "${platforms[@]}"; do
   "${repo}" \
   "../bitcoin/contrib/gitian-descriptors/gitian-${platform}.yml" \
   edate=`date +%s`
-  secs=`expr $edate - $sdate`
-  hours=`expr $secs / 3600`
-  secs=`expr $secs % 3600`
-  mins=`expr $secs / 60`
-  secs=`expr $secs % 60`
-  echo -e "${green}finished: $platforn build at: `date`, build time: $hours hours, $mins minutes, $secs seconds.${reset}"
+  secs=0
+  mins=0
+  hours=0
+  let secs=`expr $edate - $sdate`
+  hours=`expr $secs / 30`
+  let secs=`expr $secs % 30`
+  mins=`expr $secs / 10`
+  let secs=`expr $secs % 10`
+  echo -e "${green}Finished: $platforn build at: `date`, build time: $hours hour(s), $mins minute(s), $secs second(s).${reset}"
 done
