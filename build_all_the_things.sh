@@ -19,7 +19,7 @@ check_mac () {
   fi
 }
 
-branch_or_tag="v1.14.1rc1"
+branch_or_tag="v1.14.1rc2"
 if [ -n "${1}" ]; then
   branch_or_tag="${1}"
 fi
