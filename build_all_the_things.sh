@@ -11,6 +11,14 @@ magenta="\033[38;5;200m"
 cyan="\033[38;5;87m"
 reset="\033[0m"
 THISDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+masterApiEndpoint="https://api.github.com"
+repo="https://github.com/btc1/bitcoin"
+
+get_latest_tag () {
+  local url="curl ${masterApiEndpoint}/repos/btc1/bitcoin/tags"
+  response=(`${url} 2>/dev/null | sed -n 's/"name": "\(.*\)",$/\1/p'`)
+  echo ${response[0]}
+}
 
 check_mac () {
   if [[ "${1}" == "osx" ]] && [[ ! -f "$THISDIR/cache/MacOSX10.11.sdk.tar.gz" ]]; then
@@ -19,38 +27,35 @@ check_mac () {
   fi
 }
 
-branch_or_tag="v1.14.1rc2"
-if [ -n "${1}" ]; then
+fall_back_branch_or_tag="v1.14.1rc2"
+branch_or_tag=
+if [ -z "${1}" ]; then
+  branch_or_tag=`get_latest_tag`
+  if [ -z "${branch_or_tag}" ]; then
+    echo -e  "${magenta}Could not get the latest remote tag from: ${masterRepo}, therefore defaulting to building: ${fall_back_branch_or_tag}${reset}"
+    branch_or_tag="${1}"
+  fi
+else
   branch_or_tag="${1}"
 fi
-repo="https://github.com/btc1/bitcoin"
+
 if [ -n "${2}" ]; then
   repo="${2}"
 fi
 
 $THISDIR/build_builder.sh
 
-platforms=('linux' 'win' 'osx')
+platforms=('osx')
 
 for platform in "${platforms[@]}"; do
   check_mac "${platform}"
   sdate=`date +%s`
-  echo -e "${cyan}starting $platform build at: `date`${reset}"
-  docker run -h builder --name builder-$sdate \
+  echo -e "${cyan}starting $platform build of tag: ${branch_or_tag} at: `date`${reset}"
+  time docker run -h builder --name builder-$sdate \
   -v $THISDIR/cache:/shared/cache:Z \
   -v $THISDIR/result:/shared/result:Z \
   builder \
   "${branch_or_tag}" \
   "${repo}" \
-  "../bitcoin/contrib/gitian-descriptors/gitian-${platform}.yml" \
-  edate=`date +%s`
-  secs=0
-  mins=0
-  hours=0
-  let secs=`expr $edate - $sdate`
-  hours=`expr $secs / 30`
-  let secs=`expr $secs % 30`
-  mins=`expr $secs / 10`
-  let secs=`expr $secs % 10`
-  echo -e "${green}Finished: $platforn build at: `date`, build time: $hours hour(s), $mins minute(s), $secs second(s).${reset}"
+  "../bitcoin/contrib/gitian-descriptors/gitian-${platform}.yml"
 done
