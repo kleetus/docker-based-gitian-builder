@@ -65,9 +65,9 @@ sign_manifest () {
   fi
   echo "Attempting to sign manifest: ${1}"
   if [ -n "${passphrase}" ]; then
-    gpg --batch --yes -b --passphrase "${passphrase}" "${1}"
+    gpg --batch --yes -b --armor --passphrase "${passphrase}" "${1}"
   else
-    gpg -b "${1}"
+    gpg -b --armor "${1}"
   fi
 }
 
